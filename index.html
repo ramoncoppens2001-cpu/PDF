@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Blad</title>
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect x='12' y='6' width='40' height='52' rx='5' fill='%23fff' stroke='%23007AFF' stroke-width='4'/%3E%3Cpath d='M20 22h24M20 32h24M20 42h14' stroke='%23007AFF' stroke-width='4' stroke-linecap='round'/%3E%3C/svg%3E">
+<title>Preview</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cpath d='M15 3h25l15 15v39a4 4 0 0 1-4 4H15a4 4 0 0 1-4-4V7a4 4 0 0 1 4-4z' fill='%23E2231A'/%3E%3Cpath d='M40 3v11a4 4 0 0 0 4 4h11z' fill='%23F59A95'/%3E%3Ctext x='33' y='47' font-family='Arial,Helvetica,sans-serif' font-weight='700' font-size='17' fill='%23fff' text-anchor='middle'%3EPDF%3C/text%3E%3C/svg%3E">
 <style>
 :root{
   --window:#FFFFFF; --toolbar:rgba(246,246,247,.86); --sidebar:#F3F3F5; --canvas:#D8D8DC;
@@ -132,7 +132,9 @@ svg.i{width:18px;height:18px;flex:none;fill:none;stroke:currentColor;stroke-widt
 .empty p{color:var(--secondary);font-size:13.5px;margin:0 0 20px}
 .empty .pill{height:32px;padding:0 18px;font-size:13.5px}
 .empty .keys{margin-top:18px;font-size:12px;color:var(--tertiary)}
-.viewer.dropping .empty-doc{outline:3px solid var(--accent);outline-offset:8px}
+.empty-icon{width:76px;height:76px;margin:0 auto 20px;filter:drop-shadow(0 4px 10px rgba(0,0,0,.18))}
+.empty-icon svg{display:block}
+.viewer.dropping .empty-icon{outline:3px solid var(--accent);outline-offset:10px;border-radius:12px}
 
 /* annotation inputs */
 .text-input{position:absolute;z-index:3;margin:0;padding:0 2px;border:0;outline:1.5px solid var(--accent);border-radius:2px;background:rgba(255,255,255,.85);
@@ -142,6 +144,27 @@ svg.i{width:18px;height:18px;flex:none;fill:none;stroke:currentColor;stroke-widt
 .note-actions{display:flex;justify-content:space-between;margin-top:4px}
 .note-actions button{height:24px;padding:0 10px;border-radius:6px;border:0;background:rgba(0,0,0,.08);color:#1D1D1F}
 .note-actions button.del{background:transparent;color:#D70015}
+
+/* measure bar */
+.mbar{position:absolute;left:50%;bottom:18px;transform:translateX(-50%);z-index:10;display:flex;align-items:center;gap:8px;padding:5px 6px;border-radius:12px;
+  background:var(--menu);box-shadow:var(--pop-shadow);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);max-width:calc(100% - 24px)}
+.mbar .seg button{width:auto;padding:0 12px;font-size:12.5px}
+.mbtn{height:28px;padding:0 10px;border:0;border-radius:7px;background:var(--control);font-size:12.5px;white-space:nowrap;font-variant-numeric:tabular-nums}
+.mbtn:hover{background:var(--control-hover)}
+.mbtn.warn{background:#E8590C;color:#fff}
+.mbar select,.unit-select{height:28px;border:0;border-radius:7px;background:var(--control);padding:0 6px;font-size:12.5px}
+.mhint{font-size:12px;color:var(--secondary);max-width:300px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.mdone{height:28px;padding:0 12px;border:0;border-radius:7px;background:var(--accent);color:#fff;font-weight:500}
+.ratio-row{display:flex;align-items:center;justify-content:center;gap:8px;font-size:20px;font-weight:500;margin:6px 0 12px}
+.ratio-row .ratio-in{width:140px;height:40px;font-size:20px;text-align:center;font-variant-numeric:tabular-nums}
+.ratio-row .unit-select{height:40px;font-size:15px;padding:0 10px}
+.chips{display:flex;flex-wrap:wrap;gap:6px;justify-content:center}
+.ratio-chip{height:26px;padding:0 10px;border:0;border-radius:13px;background:var(--control);font-size:12px;font-variant-numeric:tabular-nums}
+.ratio-chip:hover{background:var(--accent-soft)}
+.dlg-note.big{font-size:13px;margin:4px 0 14px}
+.center{text-align:center;margin-bottom:6px}
+.danger-link{color:var(--danger)}
+@media (max-width:900px){.mhint{display:none}}
 
 /* HUD, toast, busy, drop */
 .hud{position:absolute;left:50%;bottom:18px;transform:translateX(-50%);z-index:10;display:flex;align-items:center;gap:12px;padding:6px 6px 6px 14px;border-radius:20px;
@@ -242,7 +265,7 @@ dialog::backdrop{background:rgba(0,0,0,.28)}
         <button data-view="pages" title="Paginaweergave" aria-label="Paginaweergave" aria-pressed="true" disabled><svg class="i" viewBox="0 0 24 24"><rect x="6" y="3.5" width="12" height="17" rx="1.8"/><path d="M9 8h6M9 11.5h6M9 15h4"/></svg></button>
         <button data-view="grid" title="Galerijweergave" aria-label="Galerijweergave" aria-pressed="false" disabled><svg class="i" viewBox="0 0 24 24"><rect x="4" y="4" width="6.5" height="7" rx="1.2"/><rect x="13.5" y="4" width="6.5" height="7" rx="1.2"/><rect x="4" y="13" width="6.5" height="7" rx="1.2"/><rect x="13.5" y="13" width="6.5" height="7" rx="1.2"/></svg></button>
       </div>
-      <div class="title"><div class="title-main"><span id="docTitle">Blad</span><span class="edited" id="edited" hidden>Bewerkt</span></div><div class="title-sub" id="docSub"></div></div>
+      <div class="title"><div class="title-main"><span id="docTitle">Preview</span><span class="edited" id="edited" hidden>Bewerkt</span></div><div class="title-sub" id="docSub"></div></div>
     </div>
     <div class="tb-center">
       <div class="group hide-narrow" id="zoomGroup">
@@ -258,6 +281,7 @@ dialog::backdrop{background:rgba(0,0,0,.28)}
         <button data-tool="pen" title="Teken (P)" aria-label="Teken" disabled><svg class="i" viewBox="0 0 24 24"><path d="M4 20l1.2-4.4L15.6 5.2a2 2 0 0 1 2.8 0l.4.4a2 2 0 0 1 0 2.8L8.4 18.8z"/><path d="m13.5 7.3 3.2 3.2"/></svg></button>
         <button data-tool="text" title="Tekstvak (T)" aria-label="Tekstvak" disabled><svg class="i" viewBox="0 0 24 24"><rect x="3.5" y="3.5" width="17" height="17" rx="3"/><path d="M8.5 8.5h7M12 8.5v8"/></svg></button>
         <button data-tool="note" title="Notitie (O)" aria-label="Notitie" disabled><svg class="i" viewBox="0 0 24 24"><path d="M5 4.5h14A1.5 1.5 0 0 1 20.5 6v9a1.5 1.5 0 0 1-1.5 1.5h-9l-4.5 3.5v-3.5H5A1.5 1.5 0 0 1 3.5 15V6A1.5 1.5 0 0 1 5 4.5z"/></svg></button>
+        <button data-tool="measure" title="Meet afstand en oppervlakte (R)" aria-label="Meten" disabled><svg class="i" viewBox="0 0 24 24"><path d="M3.5 15.8 15.8 3.5l4.7 4.7L8.2 20.5z"/><path d="m7.4 11.9 1.8 1.8M10.2 9.1l1.2 1.2M13 6.3l1.8 1.8"/></svg></button>
         <button data-tool="sig" id="sigBtn" title="Handtekening (H)" aria-label="Handtekening" disabled><svg class="i" viewBox="0 0 24 24"><path d="M3 16.5c2.5-5 4.5-9 6.5-9 1.8 0-.8 8.5 1.2 8.5 1.6 0 2.8-3.5 4-3.5 1 0 .8 2.5 2.4 2.5 1 0 2-.8 3.4-1.4"/><path d="M3.5 20.5h17"/></svg></button>
       </div>
       <button class="tb-btn" id="colorBtn" title="Kleur en tekstgrootte" aria-label="Kleur en tekstgrootte" disabled><span class="well" id="well"></span><svg class="i chev" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg></button>
@@ -284,7 +308,7 @@ dialog::backdrop{background:rgba(0,0,0,.28)}
     <main class="viewer" id="viewer" data-tool="select">
       <div class="empty" id="empty">
         <div class="empty-inner">
-          <div class="empty-doc" aria-hidden="true"></div>
+          <div class="empty-icon" aria-hidden="true"><svg xmlns='http://www.w3.org/2000/svg' width='76' height='76' viewBox='0 0 64 64'><path d='M15 3h25l15 15v39a4 4 0 0 1-4 4H15a4 4 0 0 1-4-4V7a4 4 0 0 1 4-4z' fill='#E2231A'/><path d='M40 3v11a4 4 0 0 0 4 4h11z' fill='#F59A95'/><text x='33' y='47' font-family='Arial,Helvetica,sans-serif' font-weight='700' font-size='17' fill='#fff' text-anchor='middle'>PDF</text></svg></div>
           <h1 id="emptyTitle">Open een PDF</h1>
           <p id="emptyText">Bekijk en bewerk een bestaande PDF, of stel een nieuwe PDF samen uit meerdere bestanden. Je kunt ook bestanden hierheen slepen.</p>
           <div class="empty-actions"><button class="pill" id="emptyPrimary">Open PDF…</button><button class="btn2 lg" id="emptySecondary">Nieuwe PDF samenstellen</button></div>
@@ -293,6 +317,13 @@ dialog::backdrop{background:rgba(0,0,0,.28)}
       </div>
       <div class="doc" id="doc"></div>
       <div class="gallery" id="gallery" tabindex="0" role="listbox" aria-label="Galerij" aria-multiselectable="true" hidden></div>
+      <div class="mbar" id="mbar" hidden>
+        <div class="seg" id="mmodeSeg"><button data-m="line" aria-pressed="true">Afstand</button><button data-m="poly" aria-pressed="false">Oppervlakte</button></div>
+        <button class="mbtn" id="scaleBtn">Stel schaal in</button>
+        <select id="unitSel" aria-label="Eenheid"><option value="mm">mm</option><option value="cm">cm</option><option value="m">m</option></select>
+        <span class="mhint" id="mHint"></span>
+        <button class="mdone" id="mDone">Klaar</button>
+      </div>
       <div class="hud" id="hud" hidden><span id="hudText"></span><button id="hudDone">Klaar</button></div>
     </main>
   </div>
@@ -343,6 +374,39 @@ dialog::backdrop{background:rgba(0,0,0,.28)}
     <span class="spacer"></span>
     <button class="btn2" id="sigCancel">Annuleer</button>
     <button class="pill" id="sigPlace" disabled>Plaats</button>
+  </div>
+</dialog>
+
+ <dialog id="scaleDlg" aria-labelledby="scaleTitle">
+  <div class="dlg-body">
+    <h2 id="scaleTitle">Schaal instellen</h2>
+    <div class="seg" id="scaleTabs" role="tablist">
+      <button role="tab" data-mode="ratio" aria-pressed="true">Schaalverhouding</button>
+      <button role="tab" data-mode="calib" aria-pressed="false">Bekende maat</button>
+    </div>
+    <div data-panel="ratio">
+      <div class="ratio-row"><span>1 :</span><input class="sig-input ratio-in" id="ratioIn" inputmode="decimal" value="100" aria-label="Schaal"></div>
+      <div class="chips"><button class="ratio-chip" data-r="10">1:10</button><button class="ratio-chip" data-r="20">1:20</button><button class="ratio-chip" data-r="50">1:50</button><button class="ratio-chip" data-r="100">1:100</button><button class="ratio-chip" data-r="200">1:200</button><button class="ratio-chip" data-r="500">1:500</button><button class="ratio-chip" data-r="1000">1:1000</button></div>
+      <p class="dlg-note">Werkt als de PDF op ware papiergrootte is, zoals bij de meeste bouwtekeningen. Twijfel je? Gebruik dan "Bekende maat".</p>
+    </div>
+    <div data-panel="calib" hidden>
+      <div id="calNone">
+        <p class="dlg-note big">Trek op de tekening een lijn over een maat die je kent, bijvoorbeeld een maatlijn of een deur van 90 cm.</p>
+        <div class="center"><button class="pill" id="calDraw">Teken lijn</button></div>
+      </div>
+      <div id="calHave" hidden>
+        <p class="dlg-note big">Hoe lang is de lijn die je net hebt getekend?</p>
+        <div class="ratio-row"><input class="sig-input ratio-in" id="calIn" inputmode="decimal" placeholder="bijv. 4,5" aria-label="Werkelijke lengte"><select id="calUnit" class="unit-select" aria-label="Eenheid"><option value="mm">mm</option><option value="cm">cm</option><option value="m">m</option></select></div>
+        <div class="center"><button class="link" id="calRedraw">Lijn opnieuw tekenen</button></div>
+      </div>
+    </div>
+  </div>
+  <div class="dlg-foot">
+    <label class="check-label"><input type="checkbox" id="scaleAll" checked> Voor alle pagina's</label>
+    <span class="spacer"></span>
+    <button class="link danger-link" id="scaleRemove" hidden>Wis schaal</button>
+    <button class="btn2" id="scaleCancel">Annuleer</button>
+    <button class="pill" id="scaleApply">Stel in</button>
   </div>
 </dialog>
 
@@ -532,7 +596,81 @@ function sigFrame(a, vp, total){
   return { ax, ay, c: Math.cos(ang), s: Math.sin(ang), W: a.w * vp.scale, H: a.h * vp.scale };
 }
 function sigHandle(a, vp, total){ const f = sigFrame(a, vp, total); return [f.ax + f.W * f.c - f.H * f.s, f.ay + f.W * f.s + f.H * f.c]; }
+/* measurements: stored in PDF coordinates, so zoom never changes them */
+const MCOL = '#E8590C';
+const UNITS = { mm: 1000, cm: 100, m: 1 };
+const PT_M = 0.0254 / 72; // one PDF point on paper, in metres
+function mLen(pts, closed){
+  let s = 0;
+  for (let i = 1; i < pts.length; i++) s += Math.hypot(pts[i][0] - pts[i - 1][0], pts[i][1] - pts[i - 1][1]);
+  if (closed && pts.length > 2) s += Math.hypot(pts[0][0] - pts.at(-1)[0], pts[0][1] - pts.at(-1)[1]);
+  return s;
+}
+function mArea(pts){
+  let s = 0;
+  for (let i = 0; i < pts.length; i++) { const [x1, y1] = pts[i], [x2, y2] = pts[(i + 1) % pts.length]; s += x1 * y2 - x2 * y1; }
+  return Math.abs(s) / 2;
+}
+const nlNum = (v, d) => v.toLocaleString('nl-NL', { minimumFractionDigits: d, maximumFractionDigits: d });
+function lenText(len, sc){ const u = ed.unit; return nlNum(len * sc.f * UNITS[u], u === 'mm' ? 0 : u === 'cm' ? 1 : 2) + ' ' + u; }
+function areaText(ar, sc){ const u = ed.unit, f = sc.f * UNITS[u]; return nlNum(ar * f * f, u === 'm' ? 2 : 0) + ' ' + u + '²'; }
+function measureLines(a, sc){
+  if (sc && sc.calib) return ['Bekende maat'];
+  if (!sc) return ['Geen schaal'];
+  if (a.mode === 'line') return [lenText(mLen(a.pts, false), sc)];
+  if (a.pts.length < 3) return [lenText(mLen(a.pts, false), sc)];
+  return [areaText(mArea(a.pts), sc), 'omtrek ' + lenText(mLen(a.pts, true), sc)];
+}
+function polyCentroid(P){
+  let A = 0, cx = 0, cy = 0;
+  for (let i = 0; i < P.length; i++) { const [x1, y1] = P[i], [x2, y2] = P[(i + 1) % P.length], f = x1 * y2 - x2 * y1; A += f; cx += (x1 + x2) * f; cy += (y1 + y2) * f; }
+  if (Math.abs(A) < 1e-6) return [P.reduce((s, p) => s + p[0], 0) / P.length, P.reduce((s, p) => s + p[1], 0) / P.length];
+  return [cx / (3 * A), cy / (3 * A)];
+}
+function measureLabelPos(P, a){
+  if (a.mode === 'line' || P.length < 3) { const i = Math.max(0, Math.floor((P.length - 1) / 2)); const q = P[Math.min(i + 1, P.length - 1)]; return [(P[i][0] + q[0]) / 2, (P[i][1] + q[1]) / 2]; }
+  return polyCentroid(P);
+}
+function drawMeasureLabel(ctx, x, y, lines, vp){
+  const fs = Math.max(7, 9 * vp.scale), lh = fs * 1.25, pad = fs * 0.35;
+  ctx.font = `600 ${fs}px Helvetica, Arial, sans-serif`;
+  const w = Math.max(...lines.map(l => ctx.measureText(l).width)) + fs, h = lines.length * lh + pad * 2;
+  ctx.fillStyle = 'rgba(255,255,255,.96)'; ctx.strokeStyle = MCOL; ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.roundRect(x - w / 2, y - h / 2, w, h, fs * 0.3); ctx.fill(); ctx.stroke();
+  ctx.fillStyle = '#1D1D1F'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  lines.forEach((l, i) => ctx.fillText(l, x, y - h / 2 + pad + (i + 0.5) * lh));
+  ctx.textAlign = 'start'; ctx.textBaseline = 'alphabetic';
+}
+function drawMeasure(ctx, vp, a, sc){
+  const P = a.pts.map(q => vp.convertToViewportPoint(q[0], q[1]));
+  if (P.length < 2 && !(a.open && P.length === 1)) return;
+  ctx.save();
+  ctx.strokeStyle = MCOL; ctx.fillStyle = MCOL; ctx.lineWidth = Math.max(1, 1.2 * vp.scale); ctx.lineJoin = 'round'; ctx.lineCap = 'round';
+  if (a.mode === 'line') {
+    const [p0, p1] = P, dx = p1[0] - p0[0], dy = p1[1] - p0[1], L = Math.hypot(dx, dy) || 1, t = Math.max(4, 5 * vp.scale);
+    const nx = -dy / L * t, ny = dx / L * t;
+    ctx.beginPath(); ctx.moveTo(p0[0], p0[1]); ctx.lineTo(p1[0], p1[1]);
+    ctx.moveTo(p0[0] - nx, p0[1] - ny); ctx.lineTo(p0[0] + nx, p0[1] + ny);
+    ctx.moveTo(p1[0] - nx, p1[1] - ny); ctx.lineTo(p1[0] + nx, p1[1] + ny);
+    ctx.stroke();
+  } else {
+    ctx.beginPath(); P.forEach((p, i) => i ? ctx.lineTo(p[0], p[1]) : ctx.moveTo(p[0], p[1]));
+    if (!a.open) ctx.closePath();
+    if (P.length > 2) { ctx.save(); ctx.fillStyle = 'rgba(232,89,12,.13)'; ctx.fill(); ctx.restore(); }
+    ctx.stroke();
+    if (a.open && P.length > 2) { ctx.save(); ctx.setLineDash([4, 4]); ctx.globalAlpha = .6; ctx.beginPath(); ctx.moveTo(P.at(-1)[0], P.at(-1)[1]); ctx.lineTo(P[0][0], P[0][1]); ctx.stroke(); ctx.restore(); }
+    const r = Math.max(1.6, 2 * vp.scale);
+    P.forEach(p => { ctx.beginPath(); ctx.arc(p[0], p[1], r, 0, Math.PI * 2); ctx.fill(); });
+    if (a.snapFirst) { ctx.beginPath(); ctx.arc(P[0][0], P[0][1], 8, 0, Math.PI * 2); ctx.stroke(); }
+  }
+  if (P.length >= 2) { const [lx, ly] = measureLabelPos(P, a); drawMeasureLabel(ctx, lx, ly, measureLines(a, sc), vp); }
+  ctx.restore();
+}
 function annotBox(a, vp, total){
+  if (a.type === 'measure') {
+    const P = a.pts.map(q => vp.convertToViewportPoint(q[0], q[1])), xs = P.map(p => p[0]), ys = P.map(p => p[1]);
+    return { x: Math.min(...xs) - 3, y: Math.min(...ys) - 3, w: Math.max(...xs) - Math.min(...xs) + 6, h: Math.max(...ys) - Math.min(...ys) + 6 };
+  }
   if (a.type === 'hl') {
     const [x1, y1] = vp.convertToViewportPoint(a.x1, a.y1), [x2, y2] = vp.convertToViewportPoint(a.x2, a.y2);
     return { x: Math.min(x1, x2), y: Math.min(y1, y2), w: Math.abs(x2 - x1), h: Math.abs(y2 - y1) };
@@ -558,9 +696,10 @@ function drawNoteIcon(ctx, x, y, s){
   for (let i = 1; i <= 3; i++) { const ly = y + s * (0.12 + i * 0.18); ctx.beginPath(); ctx.moveTo(x + s * 0.2, ly); ctx.lineTo(x + s * (i === 3 ? 0.55 : 0.8), ly); ctx.stroke(); }
   ctx.restore();
 }
-function drawAnnots(ctx, vp, annots, total, hide = -1){
+function drawAnnots(ctx, vp, annots, total, hide = -1, sc = null){
   annots.forEach((a, i) => {
     if (i === hide) return;
+    if (a.type === 'measure') { drawMeasure(ctx, vp, a, sc); return; }
     if (a.type === 'hl') {
       const b = annotBox(a, vp, total);
       ctx.save(); ctx.globalCompositeOperation = 'multiply'; ctx.fillStyle = hexA(a.color || HLC[0], 0.5); ctx.fillRect(b.x, b.y, b.w, b.h); ctx.restore();
@@ -699,11 +838,16 @@ function redrawOverlay(pv){
   ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.clearRect(0, 0, pv.overlay.width, pv.overlay.height);
   ctx.setTransform(pv.odpr, 0, 0, pv.odpr, 0, 0);
   const hide = ed.hide && ed.hide.id === pv.id ? ed.hide.idx : -1;
-  drawAnnots(ctx, vp, p.annots, pv.total, hide);
+  drawAnnots(ctx, vp, p.annots, pv.total, hide, p.scale);
   const d = ed.drag;
   if (d && d.id === pv.id) {
     if (d.mode === 'hl') drawAnnots(ctx, vp, [{ type: 'hl', color: ed.hl, x1: d.start[0], y1: d.start[1], x2: d.cur[0], y2: d.cur[1] }], pv.total);
     if (d.mode === 'pen') drawAnnots(ctx, vp, [{ type: 'pen', pts: d.pts, color: ed.ink, w: 2 }], pv.total);
+    if (d.mode === 'mline' || d.mode === 'calib') drawAnnots(ctx, vp, [{ type: 'measure', mode: 'line', pts: [d.start, d.cur] }], pv.total, -1, d.mode === 'calib' ? { f: 0, calib: true } : p.scale);
+  }
+  if (ed.poly && ed.poly.id === pv.id) {
+    const pts = ed.poly.hover ? [...ed.poly.pts, ed.poly.hover] : ed.poly.pts;
+    drawAnnots(ctx, vp, [{ type: 'measure', mode: 'poly', open: true, pts, snapFirst: ed.poly.snap }], pv.total, -1, p.scale);
   }
   if (ed.sel && ed.sel.id === pv.id && ed.sel.idx !== hide) {
     const a = p.annots[ed.sel.idx];
@@ -818,7 +962,7 @@ function createList({ container, scroller, tw, th, axis, gallery, area }){
   }, { root: scroller, rootMargin: '300px 0px' });
   return L;
 }
-const thumbKey = (p, L) => L.tw + '|' + p.rot + '|' + JSON.stringify(p.annots);
+const thumbKey = (p, L) => L.tw + '|' + p.rot + '|' + JSON.stringify(p.annots) + JSON.stringify(p.scale || 0) + ed.unit;
 const side = createList({ container: thumbsEl, scroller: thumbsEl, tw: 116, th: 150, axis: 'y', gallery: false, area: 'sidebar' });
 const gal = createList({ container: galleryEl, scroller: viewer, tw: GSIZES[1][0], th: GSIZES[1][1], axis: 'grid', gallery: true, area: 'gallery' });
 gal.tail = document.createElement('button');
@@ -899,7 +1043,7 @@ async function renderThumb(L, t, p, key){
   const c = document.createElement('canvas'); c.width = Math.ceil(vp.width); c.height = Math.ceil(vp.height);
   const ctx = c.getContext('2d');
   await proxyOf(p).render({ canvasContext: ctx, viewport: vp }).promise;
-  drawAnnots(ctx, vp, p.annots, total);
+  drawAnnots(ctx, vp, p.annots, total, -1, p.scale);
   t.frame.replaceChildren(c); t.key = key;
   if (thumbKey(p, L) !== key && t.visible) queueThumb(L, t);
 }
@@ -1103,7 +1247,7 @@ $('#addBtn').onclick = () => $('#addInput').click();
 function setFocus(area){ state.focus = area; sidebar.classList.toggle('active', area === 'sidebar'); }
 
 /* ---------- annotation editing ---------- */
-const ed = { tool: 'select', ink: INK[0], hl: HLC[0], size: 14, sel: null, drag: null, textEdit: null, noteEdit: null, hide: null, placing: null };
+const ed = { tool: 'select', ink: INK[0], hl: HLC[0], size: 14, sel: null, drag: null, textEdit: null, noteEdit: null, hide: null, placing: null, mmode: 'line', unit: (() => { try { return localStorage.getItem('preview.unit') || 'm'; } catch { return 'm'; } })(), poly: null, calibrating: false };
 const HINTS = {
   hl: 'Sleep over de tekst die je wilt markeren.',
   pen: 'Teken op de pagina.',
@@ -1113,6 +1257,7 @@ const HINTS = {
 };
 function setTool(t){
   closePending();
+  cancelPoly(); ed.calibrating = false;
   ed.placing = null;
   ed.tool = t;
   if (t !== 'select') setSel(null);
@@ -1123,11 +1268,50 @@ function setTool(t){
 function updateHud(){
   const key = ed.placing ? 'place' : ed.tool;
   const text = HINTS[key];
-  $('#hud').hidden = !text || !state.pages.length || state.view === 'grid';
+  const showable = state.pages.length && state.view === 'pages';
+  $('#hud').hidden = !text || !showable;
   if (text) $('#hudText').textContent = text;
+  $('#mbar').hidden = !(showable && ed.tool === 'measure' && !ed.placing);
+  if (!$('#mbar').hidden) updateMbar();
+}
+function curScale(){ const p = pageById(state.current); return p ? p.scale : null; }
+function updateMbar(){
+  $$('#mmodeSeg button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.m === ed.mmode)));
+  $('#unitSel').value = ed.unit;
+  const sc = curScale();
+  $('#scaleBtn').textContent = sc ? (sc.ratio ? `Schaal 1:${nlNum(sc.ratio, 0)}` : 'Schaal: gekalibreerd') : 'Stel schaal in';
+  $('#scaleBtn').classList.toggle('warn', !sc);
+  $('#mHint').textContent = ed.calibrating ? 'Trek een lijn over een maat die je kent.'
+    : ed.mmode === 'line' ? 'Sleep van punt naar punt. Houd Shift ingedrukt voor een rechte lijn.'
+    : ed.poly ? 'Klik op het eerste punt of dubbelklik om te sluiten. Backspace haalt het laatste punt weg.'
+    : 'Klik de hoeken van het vlak een voor een aan.';
+}
+function cancelPoly(){ if (ed.poly) { const id = ed.poly.id; ed.poly = null; redrawPage(id); } }
+function finishPoly(){
+  const pl = ed.poly; if (!pl) return;
+  const pts = [];
+  for (const q of pl.pts) { const last = pts.at(-1); if (!last || Math.hypot(q[0] - last[0], q[1] - last[1]) > 0.5) pts.push(q); }
+  ed.poly = null;
+  const p = pageById(pl.id);
+  if (p && pts.length >= 3) { commit(); p.annots.push({ type: 'measure', mode: 'poly', pts }); annotsChanged(pl.id); }
+  else redrawPage(pl.id);
+  updateMbar();
+}
+function snapPt(ax, ay, x, y){
+  const dx = x - ax, dy = y - ay, ang = Math.atan2(dy, dx), st = Math.PI / 4, s = Math.round(ang / st) * st, len = Math.hypot(dx, dy) * Math.cos(ang - s);
+  return [ax + Math.cos(s) * len, ay + Math.sin(s) * len];
 }
 $('#hudDone').onclick = () => setTool('select');
-$$('#tools button').forEach(b => b.addEventListener('click', () => b.dataset.tool === 'sig' ? openSig() : setTool(b.dataset.tool)));
+$$('#tools button').forEach(b => b.addEventListener('click', () => b.dataset.tool === 'sig' ? openSig() : b.dataset.tool === 'measure' ? startMeasure() : setTool(b.dataset.tool)));
+function startMeasure(){ setTool('measure'); if (!curScale()) openScaleDlg(); }
+$$('#mmodeSeg button').forEach(b => b.onclick = () => { cancelPoly(); ed.calibrating = false; ed.mmode = b.dataset.m; updateMbar(); });
+$('#unitSel').addEventListener('change', e => {
+  ed.unit = e.target.value; try { localStorage.setItem('preview.unit', ed.unit); } catch {}
+  for (const pv of views.values()) redrawPage(pv.id);
+  layoutThumbs(); updateMbar();
+});
+$('#scaleBtn').onclick = () => openScaleDlg();
+$('#mDone').onclick = () => setTool('select');
 
 function setSel(sel){
   const old = ed.sel; ed.sel = sel;
@@ -1160,7 +1344,12 @@ function hitTest(pv, p, x, y){
   const vp = pv.vp;
   for (let i = p.annots.length - 1; i >= 0; i--) {
     const a = p.annots[i];
-    if (a.type === 'pen') {
+    if (a.type === 'measure') {
+      const P = a.pts.map(q => vp.convertToViewportPoint(q[0], q[1])), segs = a.mode === 'poly' ? P.length : P.length - 1;
+      for (let k = 0; k < segs; k++) { const q = P[(k + 1) % P.length]; if (segDist(x, y, P[k][0], P[k][1], q[0], q[1]) < 7) return i; }
+      const [lx, ly] = measureLabelPos(P, a); if (Math.abs(x - lx) < 40 && Math.abs(y - ly) < 14) return i;
+      if (a.mode === 'poly') { let inside = false; for (let k = 0, j = P.length - 1; k < P.length; j = k++) { if ((P[k][1] > y) !== (P[j][1] > y) && x < (P[j][0] - P[k][0]) * (y - P[k][1]) / (P[j][1] - P[k][1]) + P[k][0]) inside = !inside; } if (inside) return i; }
+    } else if (a.type === 'pen') {
       const pts = a.pts.map(q => vp.convertToViewportPoint(q[0], q[1])), tol = 6 + a.w * vp.scale / 2;
       if (pts.length === 1 && Math.hypot(x - pts[0][0], y - pts[0][1]) < tol) return i;
       for (let k = 1; k < pts.length; k++) if (segDist(x, y, pts[k - 1][0], pts[k - 1][1], pts[k][0], pts[k][1]) < tol) return i;
@@ -1173,7 +1362,7 @@ function hitTest(pv, p, x, y){
 }
 function moveAnnot(a, dx, dy){
   if (a.type === 'hl') { a.x1 = r2(a.x1 + dx); a.x2 = r2(a.x2 + dx); a.y1 = r2(a.y1 + dy); a.y2 = r2(a.y2 + dy); }
-  else if (a.type === 'pen') a.pts = a.pts.map(q => [r2(q[0] + dx), r2(q[1] + dy)]);
+  else if (a.type === 'pen' || a.type === 'measure') a.pts = a.pts.map(q => [r2(q[0] + dx), r2(q[1] + dy)]);
   else { a.x = r2(a.x + dx); a.y = r2(a.y + dy); }
 }
 
@@ -1221,6 +1410,23 @@ docEl.addEventListener('pointerdown', e => {
     e.preventDefault();
     const i = hitTest(pv, p, x, y);
     if (i >= 0 && p.annots[i].type === 'text') openTextInput(pv, { idx: i }); else openTextInput(pv, { x, y });
+  } else if (ed.tool === 'measure') {
+    e.preventDefault();
+    if (ed.calibrating || ed.mmode === 'line') {
+      ed.drag = { id: pv.id, mode: ed.calibrating ? 'calib' : 'mline', start: pdf, cur: pdf, sx: x, sy: y, ex: x, ey: y };
+      pv.overlay.setPointerCapture(e.pointerId);
+    } else {
+      if (ed.poly && ed.poly.id !== pv.id) finishPoly();
+      let q = pdf;
+      if (ed.poly && e.shiftKey) { const lp = vp.convertToViewportPoint(...ed.poly.pts.at(-1)); q = vp.convertToPdfPoint(...snapPt(lp[0], lp[1], x, y)); }
+      if (!ed.poly) ed.poly = { id: pv.id, pts: [[r2(q[0]), r2(q[1])]], hover: null, snap: false };
+      else {
+        const f = vp.convertToViewportPoint(...ed.poly.pts[0]);
+        if (ed.poly.pts.length >= 3 && Math.hypot(x - f[0], y - f[1]) < 10) { finishPoly(); return; }
+        ed.poly.pts.push([r2(q[0]), r2(q[1])]);
+      }
+      redrawOverlay(pv); updateMbar();
+    }
   } else if (ed.tool === 'note') {
     e.preventDefault();
     const i = hitTest(pv, p, x, y);
@@ -1231,6 +1437,14 @@ docEl.addEventListener('pointerdown', e => {
 docEl.addEventListener('pointermove', e => {
   const pv = viewFromEvent(e); if (!pv || !pv.vp) return;
   const d = ed.drag, p = pageById(pv.id), [x, y] = pt(e, pv);
+  if (!d && ed.poly && ed.poly.id === pv.id) {
+    let q = [x, y];
+    const lp = pv.vp.convertToViewportPoint(...ed.poly.pts.at(-1)), f = pv.vp.convertToViewportPoint(...ed.poly.pts[0]);
+    if (e.shiftKey) q = snapPt(lp[0], lp[1], x, y);
+    ed.poly.snap = ed.poly.pts.length >= 3 && Math.hypot(x - f[0], y - f[1]) < 10;
+    ed.poly.hover = ed.poly.snap ? ed.poly.pts[0] : pv.vp.convertToPdfPoint(q[0], q[1]);
+    redrawOverlay(pv); return;
+  }
   if (!d) {
     let cur = '';
     if (ed.tool === 'select' && !ed.placing) {
@@ -1258,6 +1472,11 @@ docEl.addEventListener('pointermove', e => {
     const w = Math.max(24, Math.max(lx, ly * d.aspect) / pv.vp.scale);
     a.w = r2(w); a.h = r2(w / d.aspect);
   } else if (d.mode === 'hl') { d.cur = pdf; d.ex = x; d.ey = y; }
+  else if (d.mode === 'mline' || d.mode === 'calib') {
+    let q = [x, y];
+    if (e.shiftKey) q = snapPt(d.sx, d.sy, x, y);
+    d.cur = pv.vp.convertToPdfPoint(q[0], q[1]); d.ex = q[0]; d.ey = q[1];
+  }
   else if (d.mode === 'pen') { if (Math.hypot(x - d.lx, y - d.ly) < 1.5) return; d.pts.push([r2(pdf[0]), r2(pdf[1])]); d.lx = x; d.ly = y; }
   redrawOverlay(pv);
 });
@@ -1273,13 +1492,24 @@ function endDrag(){
     }
   } else if (d.mode === 'pen') {
     if (d.pts.length > 1) { commit(); p.annots.push({ type: 'pen', pts: d.pts, color: ed.ink, w: 2 }); annotsChanged(d.id); }
+  } else if (d.mode === 'mline') {
+    if (Math.hypot(d.ex - d.sx, d.ey - d.sy) > 4) {
+      commit(); p.annots.push({ type: 'measure', mode: 'line', pts: [[r2(d.start[0]), r2(d.start[1])], [r2(d.cur[0]), r2(d.cur[1])]] }); annotsChanged(d.id);
+    }
+  } else if (d.mode === 'calib') {
+    const len = Math.hypot(d.cur[0] - d.start[0], d.cur[1] - d.start[1]);
+    redrawOverlay(pv);
+    if (Math.hypot(d.ex - d.sx, d.ey - d.sy) > 8) { ed.calibrating = false; updateMbar(); openScaleDlg({ calib: { len, id: d.id } }); }
+    return;
   }
   redrawOverlay(pv);
 }
 docEl.addEventListener('pointerup', endDrag);
 docEl.addEventListener('pointercancel', endDrag);
 docEl.addEventListener('dblclick', e => {
-  const pv = viewFromEvent(e); if (!pv || ed.tool !== 'select') return;
+  const pv = viewFromEvent(e);
+  if (pv && ed.tool === 'measure' && ed.poly) { finishPoly(); return; }
+  if (!pv || ed.tool !== 'select') return;
   const p = pageById(pv.id), [x, y] = pt(e, pv), i = hitTest(pv, p, x, y);
   if (i >= 0 && p.annots[i].type === 'text') openTextInput(pv, { idx: i });
 });
@@ -1526,14 +1756,90 @@ async function startPlacing(dataUrl){
   updateHud();
 }
 
+/* ---------- scale ---------- */
+const scaleDlg = $('#scaleDlg');
+let scaleMode = 'ratio', calib = null;
+function openScaleDlg(opts = {}){
+  closePending();
+  const p = pageById(state.current); if (!p) return;
+  if (opts.calib) { scaleMode = 'calib'; calib = opts.calib; }
+  else calib = null;
+  const sc = p.scale;
+  if (!opts.calib) scaleMode = sc && sc.cal ? 'calib' : 'ratio';
+  if (sc && sc.ratio) $('#ratioIn').value = sc.ratio;
+  $('#calUnit').value = ed.unit;
+  setScaleMode(scaleMode);
+  $('#scaleRemove').hidden = !sc;
+  scaleDlg.showModal();
+  if (scaleMode === 'calib' && calib) { $('#calIn').value = ''; $('#calIn').focus(); } else if (scaleMode === 'ratio') $('#ratioIn').select();
+}
+function setScaleMode(m){
+  scaleMode = m;
+  $$('#scaleTabs button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.mode === m)));
+  $$('#scaleDlg [data-panel]').forEach(pn => pn.hidden = pn.dataset.panel !== m);
+  $('#calNone').hidden = !!calib; $('#calHave').hidden = !calib;
+  checkScale();
+}
+const parseNum = s => parseFloat(String(s).replace(/\s/g, '').replace(',', '.'));
+function checkScale(){
+  const ok = scaleMode === 'ratio' ? parseNum($('#ratioIn').value) > 0 : !!calib && parseNum($('#calIn').value) > 0;
+  $('#scaleApply').disabled = !ok;
+}
+$$('#scaleTabs button').forEach(b => b.onclick = () => setScaleMode(b.dataset.mode));
+$$('.ratio-chip').forEach(b => b.onclick = () => { $('#ratioIn').value = b.dataset.r; checkScale(); });
+['#ratioIn', '#calIn'].forEach(s => { $(s).addEventListener('input', checkScale); $(s).addEventListener('keydown', e => { if (e.key === 'Enter' && !$('#scaleApply').disabled) $('#scaleApply').click(); }); });
+function drawCalibration(){ scaleDlg.close(); if (ed.tool !== 'measure') setTool('measure'); cancelPoly(); ed.calibrating = true; updateMbar(); }
+$('#calDraw').onclick = drawCalibration;
+$('#calRedraw').onclick = drawCalibration;
+$('#scaleCancel').onclick = () => scaleDlg.close();
+function applyScale(obj){
+  const all = $('#scaleAll').checked;
+  commit();
+  if (all) state.pages.forEach(p => { p.scale = obj ? { ...obj } : undefined; });
+  else { const p = pageById(calib ? calib.id : state.current); if (p) p.scale = obj ? { ...obj } : undefined; }
+  for (const pv of views.values()) redrawPage(pv.id);
+  layoutThumbs(); updateChrome();
+}
+$('#scaleApply').onclick = () => {
+  let obj;
+  if (scaleMode === 'ratio') { const r = parseNum($('#ratioIn').value); obj = { f: r * PT_M, ratio: r }; }
+  else { const v = parseNum($('#calIn').value), u = $('#calUnit').value; obj = { f: (v / UNITS[u]) / calib.len, cal: true }; ed.unit = u; try { localStorage.setItem('preview.unit', u); } catch {} }
+  scaleDlg.close(); applyScale(obj);
+  toast(scaleMode === 'ratio' ? `Schaal 1:${nlNum(obj.ratio, 0)} ingesteld.` : 'Schaal ingesteld op basis van de bekende maat.');
+};
+$('#scaleRemove').onclick = () => { scaleDlg.close(); applyScale(null); };
+
 /* ---------- saving ---------- */
 function winAnsiSafe(font, s){
   let out = '';
   for (const ch of s.replace(/\t/g, '    ')) { if (ch === '\n') { out += ch; continue; } try { font.encodeText(ch); out += ch; } catch { out += '?'; } }
   return out;
 }
-async function drawAnnotsPdf(doc, pg, annots, font, embedded){
-  for (const a of annots) {
+async function drawAnnotsPdf(doc, pg, pageObj, font, embedded){
+  const R = norm(pg.getRotation().angle), rc = Math.cos(R * Math.PI / 180), rs = Math.sin(R * Math.PI / 180);
+  for (const a of pageObj.annots) {
+    if (a.type === 'measure') {
+      const col = hexRgb(MCOL), lw = 1.2, P = a.pts;
+      if (a.mode === 'line') {
+        const [p0, p1] = P, dx = p1[0] - p0[0], dy = p1[1] - p0[1], L = Math.hypot(dx, dy) || 1, nx = -dy / L * 5, ny = dx / L * 5;
+        pg.drawLine({ start: { x: p0[0], y: p0[1] }, end: { x: p1[0], y: p1[1] }, thickness: lw, color: col });
+        for (const q of [p0, p1]) pg.drawLine({ start: { x: q[0] - nx, y: q[1] - ny }, end: { x: q[0] + nx, y: q[1] + ny }, thickness: lw, color: col });
+      } else {
+        const d = P.map((q, k) => `${k ? 'L' : 'M'} ${q[0]} ${-q[1]}`).join(' ') + ' Z';
+        pg.drawSvgPath(d, { x: 0, y: 0, color: col, opacity: 0.13, borderColor: col, borderWidth: lw, borderOpacity: 1 });
+      }
+      const lines = measureLines(a, pageObj.scale).map(l => winAnsiSafe(font, l));
+      const [cx, cy] = measureLabelPos(P, a), fs = 9, lh = fs * 1.25, pad = fs * 0.35;
+      const w = Math.max(...lines.map(l => font.widthOfTextAtSize(l, fs))) + fs, h = lines.length * lh + pad * 2;
+      const loc = (dx, dy) => [cx + dx * rc - dy * rs, cy + dx * rs + dy * rc];
+      const [bx, by] = loc(-w / 2, -h / 2);
+      pg.drawRectangle({ x: bx, y: by, width: w, height: h, color: rgb(1, 1, 1), opacity: 0.96, borderColor: col, borderWidth: 0.8, rotate: degrees(R) });
+      lines.forEach((l, i) => {
+        const tw = font.widthOfTextAtSize(l, fs), [tx, ty] = loc(-tw / 2, h / 2 - pad - (i + 0.5) * lh - fs * 0.33);
+        pg.drawText(l, { x: tx, y: ty, size: fs, font, color: rgb(0.11, 0.11, 0.12), rotate: degrees(R) });
+      });
+      continue;
+    }
     if (a.type === 'hl') {
       pg.drawRectangle({ x: Math.min(a.x1, a.x2), y: Math.min(a.y1, a.y2), width: Math.abs(a.x2 - a.x1), height: Math.abs(a.y2 - a.y1),
         color: hexRgb(a.color || HLC[0]), opacity: 0.5, blendMode: BlendMode.Multiply });
@@ -1575,7 +1881,7 @@ async function buildPdf(list){
   for (let i = 0; i < list.length; i++) {
     const pg = copied[i], p = list[i]; out.addPage(pg);
     pg.setRotation(degrees(norm(norm(pg.getRotation().angle) + p.rot)));
-    await drawAnnotsPdf(out, pg, p.annots, font, embedded);
+    await drawAnnotsPdf(out, pg, p, font, embedded);
   }
   return out.save();
 }
@@ -1659,7 +1965,7 @@ function updateChrome(){
   $('#delPages').title = nSel > 1 ? `Verwijder ${nSel} pagina's (Delete)` : 'Verwijder pagina (Delete)';
   $('#zoomText').textContent = zoomLabel();
   if (!has) {
-    const t = state.isNew ? 'Naamloos' : state.docs.length ? baseName() : 'Blad';
+    const t = state.isNew ? 'Naamloos' : state.docs.length ? baseName() : 'Preview';
     $('#docTitle').textContent = t; $('#docSub').textContent = state.isNew ? 'Nieuwe PDF' : '';
     $('#edited').hidden = !(state.dirty && state.docs.length); document.title = t; updateHud(); return;
   }
@@ -1708,8 +2014,16 @@ document.addEventListener('keydown', e => {
   if (mod && k === '0') { e.preventDefault(); setZoom('page'); return; }
   const listFocus = state.focus === 'sidebar' || state.focus === 'gallery';
   if (mod && k === 'a' && listFocus) { e.preventDefault(); state.pages.forEach(p => state.selected.add(p.id)); updateThumbClasses(); return; }
+  if (ed.poly && e.key === 'Enter') { e.preventDefault(); finishPoly(); return; }
+  if (ed.poly && e.key === 'Backspace') {
+    e.preventDefault(); ed.poly.pts.pop();
+    if (!ed.poly.pts.length) cancelPoly(); else redrawPage(ed.poly.id);
+    updateMbar(); return;
+  }
   if (e.key === 'Escape') {
-    if (ed.placing || ed.tool !== 'select') setTool('select');
+    if (ed.poly) { cancelPoly(); updateMbar(); }
+    else if (ed.calibrating) { ed.calibrating = false; updateMbar(); }
+    else if (ed.placing || ed.tool !== 'select') setTool('select');
     else if (ed.sel) setSel(null);
     else if (state.selected.size > 1) selectOnly(state.current);
     return;
@@ -1740,6 +2054,7 @@ document.addEventListener('keydown', e => {
   }
   if (!mod && !e.altKey && state.view === 'pages') {
     if (k === 'h') { openSig(); return; }
+    if (k === 'r') { startMeasure(); return; }
     const t = { v: 'select', m: 'hl', p: 'pen', t: 'text', o: 'note' }[k];
     if (t) setTool(t);
   }
